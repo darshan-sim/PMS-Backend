@@ -1,0 +1,30 @@
+{
+    "ts-node": {
+        "esm": true
+    },
+    "compilerOptions": {
+        "baseUrl": "./src",
+        // "paths": {
+        //     "@songModule": ["modules/song/index.ts"],
+        //     "@userModule": ["modules/user/index.ts"],
+        //     "@albumModule": ["modules/album/index.ts"],
+        //     "@models": ["models/index.ts"],
+        //     "@routes": ["routes/index.ts"],
+        //     "@middlewares": ["middlewares/index.ts"],
+        //     "@db": ["db/*"],
+        //     "@utils": ["utils/index.ts"],
+        //     "@config": ["config/*"]
+        // },
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "target": "ESNext",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": false,
+        "skipLibCheck": true,
+        "typeRoots": ["./node_modules/@types", "./env.d.ts"]
+    },
+    "include": ["src/**/*", "index.ts", ".husky/**/*"],
+    "exclude": ["node_modules", "dist", "build", ".husky/_/*.sh"]
+}
