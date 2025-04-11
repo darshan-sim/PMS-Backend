@@ -118,4 +118,5 @@ dist
 .pnp.*
 
 build
+generated/prisma/
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node
