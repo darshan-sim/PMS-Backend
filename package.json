@@ -3,7 +3,16 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "tsc",
+        "start": "node build/src/server.js",
+        "dev": "tsx src/server.ts",
+        "dev:watch": "nodemon --watch src --ext ts,json --exec 'npm run dev'",
+        "lint": "eslint . --ext .ts",
+        "lint:fix": "eslint . --ext .ts --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "prepare": "husky install",
+        "precommit": "lint-staged"
     },
     "lint-staged": {
         "**/*.{ts,tsx}": [
@@ -17,7 +26,12 @@
     "description": "",
     "devDependencies": {
         "@eslint/js": "^9.24.0",
+        "@prisma/client": "^6.6.0",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.1",
+        "@types/morgan": "^1.9.9",
         "@types/node": "^22.14.0",
+        "@types/pg": "^8.11.11",
         "@typescript-eslint/eslint-plugin": "^8.29.1",
         "@typescript-eslint/parser": "^8.29.1",
         "eslint": "^9.24.0",
@@ -27,19 +41,26 @@
         "globals": "^16.0.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.5.0",
+        "morgan": "^1.10.0",
+        "nodemon": "^3.1.9",
         "prettier": "^3.5.3",
+        "prisma": "^6.6.0",
         "ts-node": "^10.9.2",
+        "tsx": "^4.19.3",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.29.1"
     },
     "dependencies": {
+        "@types/helmet": "^0.0.48",
         "bcrypt": "^5.1.1",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^5.1.0",
+        "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.13.2",
-        "multer": "^1.4.5-lts.2"
+        "multer": "^1.4.5-lts.2",
+        "pg": "^8.14.1"
     }
 }
