@@ -1,19 +1,26 @@
-export const Messages = {
-    AUTH: {
-        LOGIN_FAILED: "Invalid email or password.",
-        TOKEN_MISSING: "Access token is missing.",
-        FORBIDDEN: "You do not have permission to access this resource.",
-    },
-    VALIDATION: {
-        REQUIRED_FIELDS: "Some required fields are missing.",
-        INVALID_EMAIL: "Please provide a valid email address.",
-    },
-    SERVER: {
-        ERROR: "Something went wrong. Please try again later.",
-    },
-    SUCCESS: {
-        CREATED: "Resource created successfully.",
-        UPDATED: "Resource updated successfully.",
-        DELETED: "Resource deleted successfully.",
-    },
+import { ErrorCode } from "./errorCodes";
+import { SuccessCode } from "./successCodes";
+
+export const SuccessMessage: Record<SuccessCode, string> = {
+    [SuccessCode.USER_REGISTERED]: "User registered successfully.",
+    [SuccessCode.LOGIN_SUCCESS]: "Login successful.",
+    [SuccessCode.DATA_FETCHED]: "Data fetched successfully.",
+    [SuccessCode.CREATED]: "Resource created successfully.",
+    [SuccessCode.UPDATED]: "Resource updated successfully.",
+    [SuccessCode.DELETED]: "Resource deleted successfully.",
+    [SuccessCode.VALIDATION_SUCCESSFUL]: "Validation was successful.",
+};
+
+export const ErrorMessage: Record<ErrorCode, string> = {
+    [ErrorCode.INTERNAL_ERROR]: "Internal server error",
+    [ErrorCode.VALIDATION_ERROR]: "Validation failed",
+    [ErrorCode.NOT_FOUND]: "Resource not found",
+    [ErrorCode.UNAUTHORIZED]: "Unauthorized access",
+    [ErrorCode.FORBIDDEN]:
+        "You do not have permission to access this resource.",
+    [ErrorCode.INVALID_CREDENTIALS]: "Invalid credentials",
+    [ErrorCode.FILE_TOO_LARGE]: "File size exceeds limit",
+    [ErrorCode.INVALID_FILE_TYPE]: "Invalid file type",
+    [ErrorCode.TOO_MANY_REQUESTS]: "Too many requests from this IP",
+    [ErrorCode.TOKEN_MISSING]: "Access token is missing or invalid.",
 };

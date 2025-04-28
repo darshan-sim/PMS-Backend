@@ -1,48 +1,58 @@
-import { ErrorCode } from "../constants/errorCodes";
+import { Response } from "express";
+import { ApiResponse, Pagination } from "../types/response.type";
+import { AppError } from "src/errors/AppError";
+import { SuccessMessage } from "src/constants/messages";
+import { HttpStatus } from "src/constants/httpStatusCodes";
 
-export interface PaginationInfo {
-    readonly totalItems: number;
-    readonly currentPage: number;
-    readonly totalPages: number;
-    readonly pageSize: number;
+export class ResponseHandler {
+    static fetched<T>(
+        res: Response,
+        data: T,
+        message: string = "Request successful",
+        pagination?: Pagination
+    ): Response<ApiResponse<T>> {
+        const response: ApiResponse<T> = {
+            success: true,
+            message: message || "Request successful",
+            data,
+        };
+
+        if (pagination) {
+            response.pagination = pagination;
+        }
+
+        return res.status(HttpStatus.OK).json(response);
+    }
+
+    static created<T>(
+        res: Response,
+        data: T,
+        message: string = SuccessMessage.CREATED
+    ): Response<ApiResponse<T>> {
+        return res.status(201).json({
+            success: true,
+            message: message || SuccessMessage.CREATED,
+            data,
+        });
+    }
+
+    static error(res: Response, error: AppError): Response<ApiResponse<null>> {
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            errors: error.errors,
+        });
+    }
 }
 
-export interface ApiErrorResponse {
-    readonly success: false;
-    readonly message: string;
-    readonly code: ErrorCode;
-    readonly errors: Record<string, string>;
-}
-
-export interface ApiSuccessResponse<T> {
-    readonly success: true;
-    readonly message: string;
-    readonly data: T;
-    readonly pagination?: PaginationInfo;
-}
-
-export function successResponse<T>(
-    message: string,
-    data: T,
-    pagination?: PaginationInfo
-): ApiSuccessResponse<T> {
-    return {
-        success: true,
-        message,
-        data,
-        ...(pagination && { pagination }),
-    };
-}
-
-export function errorResponse(
-    code: ErrorCode,
-    message: string,
-    errors: Record<string, string> = {}
-): ApiErrorResponse {
-    return {
-        success: false,
-        message,
-        code,
-        errors,
-    };
-}
+// Pagination helper
+export const calculatePagination = (
+    total: number,
+    page: number,
+    pageSize: number
+): Pagination => ({
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+});

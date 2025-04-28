@@ -1,27 +1,87 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../errors/AppError";
-import { errorResponse } from "../utils/apiResponse";
-import { ErrorCode } from "../constants/errorCodes";
-import { Messages } from "src/constants/messages";
-import { HttpStatus } from "src/constants/httpStatusCodes";
+import { ResponseHandler } from "../utils/apiResponse";
+import { ZodError, ZodIssueCode } from "zod";
+import { AppError } from "src/errors/AppError";
+import { ValidationError } from "src/errors/ValidationError";
+import { InternalServerError } from "src/errors/InternalServerError";
 
 export const errorHandler = (
-    err: Error,
+    err: unknown,
     req: Request,
     res: Response,
     _next: NextFunction
-) => {
+): void => {
+    let finalError: AppError;
+
     if (err instanceof AppError) {
-        res.status(err.statusCode).json(
-            errorResponse(err.code, err.message, err.errors ?? {})
-        );
-        return;
+        finalError = err;
+    } else if (err instanceof ZodError) {
+        const formattedErrors = handleZodError(err, req.body);
+        finalError = new ValidationError(formattedErrors);
+    } else {
+        finalError = new InternalServerError(err as Error);
     }
 
-    console.error("Unexpected error:", err);
-
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
-        errorResponse(ErrorCode.INTERNAL_SERVER_ERROR, Messages.SERVER.ERROR)
-    );
-    return;
+    ResponseHandler.error(res, finalError);
 };
+
+export function handleZodError(
+    error: ZodError,
+    reqBody: Record<string, unknown>
+): Record<string, string> {
+    const formatted: Record<string, string> = {};
+    const role = reqBody?.role;
+
+    const unionIssue = error.issues.find(
+        (issue) => issue.code === ZodIssueCode.invalid_union
+    );
+
+    if (unionIssue && "unionErrors" in unionIssue) {
+        const unionErrors = unionIssue.unionErrors as ZodError[];
+
+        let profileFieldName: string | undefined;
+        switch (role) {
+            case "student":
+                profileFieldName = "studentProfileData";
+                break;
+            case "placement_cell":
+                profileFieldName = "placementCellProfileData";
+                break;
+            case "recruiter":
+                profileFieldName = "recruiterProfileData";
+                break;
+        }
+
+        if (profileFieldName) {
+            const matchedBranch =
+                unionErrors.find((branch) =>
+                    branch.issues.some(
+                        (issue) => issue.path[0] === profileFieldName
+                    )
+                ) ?? unionErrors[0];
+
+            matchedBranch.issues.forEach((issue) => {
+                if (issue.path[0] === profileFieldName) {
+                    const fullPath = [
+                        profileFieldName,
+                        ...issue.path.slice(1),
+                    ].join(".");
+                    formatted[fullPath] = issue.message;
+                } else if (issue.path[0] !== "role") {
+                    formatted[issue.path.join(".")] = issue.message;
+                }
+            });
+        }
+    } else {
+        // Normal zod errors (non-union)
+        error.issues.forEach((issue) => {
+            formatted[issue.path.join(".")] = issue.message;
+        });
+    }
+
+    if (process.env.NODE_ENV === "development") {
+        console.error("Validation failed with errors:", formatted);
+    }
+
+    return formatted;
+}
