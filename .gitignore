@@ -119,4 +119,5 @@ dist
 
 build
 generated/prisma/
+prisma/migrations/
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node
