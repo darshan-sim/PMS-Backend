@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { ResponseHandler } from "../utils/apiResponse";
 import { ZodError, ZodIssueCode } from "zod";
-import { AppError } from "src/errors/AppError";
-import { ValidationError } from "src/errors/ValidationError";
-import { InternalServerError } from "src/errors/InternalServerError";
+import { AppError } from "../errors/AppError";
+import { ValidationError } from "../errors/ValidationError";
+import { InternalServerError } from "../errors/InternalServerError";
 
 export const errorHandler = (
     err: unknown,

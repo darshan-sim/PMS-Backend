@@ -1,6 +1,6 @@
-import { HttpStatus } from "src/constants/httpStatusCodes";
+import { HttpStatus } from "../constants/httpStatusCodes";
 import { AppError } from "./AppError";
-import { ErrorMessage } from "src/constants/messages";
+import { ErrorMessage } from "../constants/messages";
 
 export class InternalServerError extends AppError {
     errors?: Record<string, string> | undefined;

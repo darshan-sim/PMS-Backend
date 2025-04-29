@@ -1,6 +1,6 @@
 import { AppError } from "./AppError";
-import { ErrorMessage } from "src/constants/messages";
-import { HttpStatus } from "src/constants/httpStatusCodes";
+import { ErrorMessage } from "../constants/messages";
+import { HttpStatus } from "../constants/httpStatusCodes";
 
 export class NotFoundError extends AppError {
     statusCode: number;

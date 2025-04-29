@@ -6,7 +6,7 @@ import {
     RegisterInput,
     StudentProfileData,
 } from "../types/auth.types";
-import { ValidationError } from "src/errors/ValidationError";
+import { ValidationError } from "../errors/ValidationError";
 
 export const validateUsernameAndEmail = async (
     username: string,

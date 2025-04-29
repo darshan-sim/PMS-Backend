@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
-import { ResponseHandler } from "src/utils/apiResponse";
+import { ResponseHandler } from "../utils/apiResponse";
 
 const prisma = new PrismaClient();
 
@@ -50,7 +50,7 @@ export const getPlacementCellForStudentRegister = async (
     try {
         const branchParam = req.query.branch as string | undefined;
 
-        const placementCells = await prisma.placementCell.findMany({
+        const placementCellsRaw = await prisma.placementCell.findMany({
             where: branchParam ? { branchId: branchParam } : undefined,
             select: {
                 placementCellId: true,
@@ -68,7 +68,13 @@ export const getPlacementCellForStudentRegister = async (
                 },
             },
         });
-
+        const placementCells = placementCellsRaw.map((cell) => ({
+            ...cell,
+            placementCellDegrees: cell.placementCellDegrees.map(
+                (d) => d.degree
+            ),
+        }));
+        console.log(placementCells);
         ResponseHandler.fetched(res, placementCells);
     } catch (err) {
         next(err);

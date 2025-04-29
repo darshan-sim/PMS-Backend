@@ -1,8 +1,8 @@
 import { Response } from "express";
 import { ApiResponse, Pagination } from "../types/response.type";
-import { AppError } from "src/errors/AppError";
-import { SuccessMessage } from "src/constants/messages";
-import { HttpStatus } from "src/constants/httpStatusCodes";
+import { AppError } from "../errors/AppError";
+import { SuccessMessage } from "../constants/messages";
+import { HttpStatus } from "../constants/httpStatusCodes";
 
 export class ResponseHandler {
     static fetched<T>(

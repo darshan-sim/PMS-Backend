@@ -3,12 +3,12 @@ import {
     registerValidationSchema,
     userValidationSchema,
 } from "../validators/auth.validator";
-import { ResponseHandler } from "src/utils/apiResponse";
+import { ResponseHandler } from "../utils/apiResponse";
 import {
     registerUser,
     validateUsernameAndEmail,
 } from "../services/auth.service";
-import { SuccessMessage } from "src/constants/messages";
+import { SuccessMessage } from "../constants/messages";
 
 export const validateUserInput = async (
     req: Request,

@@ -1,4 +1,4 @@
-import { HttpStatus } from "src/constants/httpStatusCodes";
+import { HttpStatus } from "../constants/httpStatusCodes";
 import { ErrorMessage } from "../constants/messages";
 import { AppError } from "./AppError";
 
