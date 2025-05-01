@@ -8,6 +8,22 @@ import {
 } from "../types/auth.types";
 import { ValidationError } from "../errors/ValidationError";
 
+// export const loginUser = async (email: string, password: string) => {
+//     const user = await prisma.user.findFirst({
+//         where: {
+//             email,
+//         },
+//     });
+
+//     if (user) {
+//         errorDetails.username = "Username already exists";
+//     }
+
+//     if (Object.keys(errorDetails).length > 0) {
+//         throw new ValidationError(errorDetails);
+//     }
+// };
+
 export const validateUsernameAndEmail = async (
     username: string,
     email: string
@@ -84,8 +100,10 @@ const validateStudentData = async (studentData: {
     placementCellId: string;
     degreeId: string;
     email: string;
+    enrollmentNumber: string;
 }) => {
-    const { placementCellId, degreeId, email } = studentData;
+    const { placementCellId, degreeId, email, enrollmentNumber } = studentData;
+
     if (!email.includes("@")) {
         throw new ValidationError({
             email: "Invalid email format.",
@@ -104,11 +122,25 @@ const validateStudentData = async (studentData: {
 
     if (!placementCell) {
         throw new ValidationError({
-            placementCellId: "provided PlacementCell id is Invalid",
+            placementCellId: "Provided PlacementCell ID is invalid.",
         });
     }
 
     const studentDomain = "@" + email.split("@")[1];
+
+    const student = await prisma.student.findFirst({
+        where: {
+            placementCellId: placementCellId,
+            enrollmentNumber: enrollmentNumber,
+        },
+    });
+
+    if (student) {
+        throw new ValidationError({
+            enrollmentNumber:
+                "Enrollment number already exists for this placement cell.",
+        });
+    }
 
     const domainAllowed = placementCell.placementCellDomains.some(
         (placementCellDomain) => placementCellDomain.domain === studentDomain
@@ -171,7 +203,12 @@ const registerStudent = async (
     const { email, password, username, studentProfileData } = studentData;
     const { placementCellId, degreeId, enrollmentNumber, fullName } =
         studentProfileData;
-    await validateStudentData({ placementCellId, degreeId: degreeId, email });
+    await validateStudentData({
+        placementCellId,
+        degreeId: degreeId,
+        email,
+        enrollmentNumber,
+    });
     const createdStudent = await prisma.$transaction(async (tx) => {
         // Step 3.1: Create User
         const user = await tx.user.create({

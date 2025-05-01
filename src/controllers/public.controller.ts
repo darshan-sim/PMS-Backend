@@ -55,7 +55,12 @@ export const getPlacementCellForStudentRegister = async (
             select: {
                 placementCellId: true,
                 name: true,
-                branchId: true,
+                branch: {
+                    select: {
+                        branchId: true,
+                        name: true,
+                    },
+                },
                 placementCellDegrees: {
                     select: {
                         degree: {
