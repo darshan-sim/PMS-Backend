@@ -54,7 +54,7 @@ export const getPlacementCellForStudentRegister = async (
             where: branchParam ? { branchId: branchParam } : undefined,
             select: {
                 placementCellId: true,
-                name: true,
+                placementCellName: true,
                 branch: {
                     select: {
                         branchId: true,

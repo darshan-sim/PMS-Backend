@@ -72,15 +72,15 @@ model Student {
 }
 
 model PlacementCell {
-  placementCellId String    @id @default(uuid()) @map("placement_cell_id")
-  name            String    @db.VarChar(100)
+  placementCellId    String    @id @default(uuid()) @map("placement_cell_id")
+  placementCellName  String    @unique @db.VarChar(100)
   // domains         String[] @db.Text // we'll use a helper table for unique check 
-  isVerified      Boolean   @default(false) @map("is_verified")
-  email           String?   @db.VarChar(100)
-  website         String?   @db.VarChar(100)
-  createdAt       DateTime? @default(now()) @map("created_at")
-  updatedAt       DateTime? @updatedAt @map("updated_at")
-  deletedAt       DateTime? @map("deleted_at")
+  isVerified         Boolean   @default(false) @map("is_verified")
+  placementCellEmail String?   @db.VarChar(100)
+  website            String?   @db.VarChar(100)
+  createdAt          DateTime? @default(now()) @map("created_at")
+  updatedAt          DateTime? @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
 
   // Foreign Keys
   adminId  String @unique @map("admin_id")
@@ -145,7 +145,7 @@ model Recruiter {
   representativePosition String    @map("representative_position") @db.VarChar(100)
   description            String?   @db.Text
   website                String?   @db.VarChar(100)
-  email                  String?   @db.VarChar(100)
+  companyEmail           String?   @db.VarChar(100)
   createdAt              DateTime? @default(now()) @map("created_at")
   updatedAt              DateTime? @updatedAt @map("updated_at")
   deletedAt              DateTime? @map("deleted_at")

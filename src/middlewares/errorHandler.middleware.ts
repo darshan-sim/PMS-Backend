@@ -62,20 +62,17 @@ export function handleZodError(
 
             matchedBranch.issues.forEach((issue) => {
                 if (issue.path[0] === profileFieldName) {
-                    const fullPath = [
-                        profileFieldName,
-                        ...issue.path.slice(1),
-                    ].join(".");
-                    formatted[fullPath] = issue.message;
+                    const fieldKey = issue.path.slice(1).join(".");
+                    formatted[fieldKey] = issue.message;
                 } else if (issue.path[0] !== "role") {
-                    formatted[issue.path.join(".")] = issue.message;
+                    formatted[issue.path[issue.path.length - 1]] =
+                        issue.message;
                 }
             });
         }
     } else {
-        // Normal zod errors (non-union)
         error.issues.forEach((issue) => {
-            formatted[issue.path.join(".")] = issue.message;
+            formatted[issue.path[issue.path.length - 1]] = issue.message;
         });
     }
 

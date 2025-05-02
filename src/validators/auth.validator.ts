@@ -31,13 +31,13 @@ const studentRegisterSchema = z.object({
 
 // Placement Cell profile data validation
 const placementCellRegisterSchema = z.object({
-    name: z.string().min(1, "Placement cell name is required"),
+    placementCellName: z.string().min(1, "Placement cell name is required"),
     domains: z.array(z.string()).min(1, "At least one domain is required"),
     branchName: z.string().min(1, "Branch name is required"),
     degreeNames: z
         .array(z.string())
         .min(1, "At least one degree name is required"),
-    email: z.string().email("Invalid email address"),
+    placementCellEmail: z.string().email("Invalid email address"),
     website: z.string().url("Invalid website URL"),
 });
 
@@ -49,7 +49,7 @@ const recruiterRegisterSchema = z.object({
         .min(1, "Representative position is required"),
     description: z.string(),
     website: z.string().url("Invalid website URL"),
-    email: z.string().email("Invalid email address"),
+    companyEmail: z.string().email("Invalid email address"),
 });
 
 // Union schema to validate based on role, with each profile's data specifically named

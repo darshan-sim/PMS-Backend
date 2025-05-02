@@ -18,11 +18,11 @@ export interface StudentProfileData {
 
 // Placement cell profile data
 export interface PlacementCellProfileData {
-    name: string;
+    placementCellName: string;
     domains: string[];
     branchName: string;
     degreeNames: string[];
-    email: string;
+    placementCellEmail: string;
     website: string;
 }
 
@@ -32,7 +32,7 @@ export interface RecruiterProfileData {
     representativePosition: string;
     description: string;
     website: string;
-    email: string;
+    companyEmail: string;
 }
 
 // Register input based on role with specific profile data

@@ -165,9 +165,20 @@ const validateStudentData = async (studentData: {
 };
 
 const validatePlacementCellData = async (
+    placementCellName: string,
     placementCellBranch: string,
     placementCellDegrees: string[]
 ) => {
+    const placementCell = await prisma.placementCell.findUnique({
+        where: { placementCellName },
+    });
+
+    if (!placementCell) {
+        throw new ValidationError({
+            placementCellName: "Placement cell name is taken",
+        });
+    }
+
     let branch = await prisma.branch.findUnique({
         where: { name: placementCellBranch },
     });
@@ -191,6 +202,7 @@ const validatePlacementCellData = async (
         }
         dbDegrees.push({ degreeId: degree.degreeId, name: degree.name });
     }
+
     return { branch, degrees: dbDegrees };
 };
 
@@ -259,14 +271,20 @@ const registerPlacementCell = async (
 ) => {
     const { email, username, password, placementCellProfileData } =
         placementCellData;
-    const { name, domains, branchName, degreeNames, website } =
-        placementCellProfileData;
+    const {
+        placementCellName,
+        domains,
+        branchName,
+        degreeNames,
+        website,
+        placementCellEmail,
+    } = placementCellProfileData;
 
     const { branch, degrees } = await validatePlacementCellData(
+        placementCellName,
         branchName,
         degreeNames
     );
-    console.log({ degrees }, { branch });
 
     const result = await prisma.$transaction(async (prisma) => {
         const user = await prisma.user.create({
@@ -281,9 +299,9 @@ const registerPlacementCell = async (
         const placementCell = await prisma.placementCell.create({
             data: {
                 adminId: user.userId,
-                name,
+                placementCellName,
                 branchId: branch.branchId,
-                email,
+                placementCellEmail,
                 website,
             },
         });
@@ -316,8 +334,13 @@ const registerRecruiter = async (
     }
 ) => {
     const { email, username, password, recruiterProfileData } = recruiterData;
-    const { companyName, representativePosition, description, website } =
-        recruiterProfileData;
+    const {
+        companyName,
+        representativePosition,
+        description,
+        website,
+        companyEmail,
+    } = recruiterProfileData;
 
     const result = await prisma.$transaction(async (prisma) => {
         const user = await prisma.user.create({
@@ -336,6 +359,7 @@ const registerRecruiter = async (
                 representativePosition,
                 description,
                 website,
+                companyEmail,
             },
         });
 
