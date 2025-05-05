@@ -1,6 +1,10 @@
 import { Role } from "@prisma/client";
 
-// Base user registration data
+import { Request } from "express";
+import { UserContext } from "src/auth/userContext";
+export interface IGetUserAuthInfoRequest extends Request {
+    user: UserContext;
+}
 export interface RegisterBaseData {
     email: string;
     username: string;
@@ -33,6 +37,18 @@ export interface RecruiterProfileData {
     description: string;
     website: string;
     companyEmail: string;
+}
+
+export interface AuthResponse {
+    token: string;
+    user: {
+        userId: string;
+        email: string;
+        role: string;
+        studentId?: string; // Optional for students
+        placementCellId?: string; // Optional for placement cell admins
+        recruiterId?: string; // Optional for recruiters
+    };
 }
 
 // Register input based on role with specific profile data

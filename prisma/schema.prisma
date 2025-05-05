@@ -48,19 +48,20 @@ model Student {
   placementCellId  String? @map("placement_cell_id")
   degreeId         String  @map("degree_id")
 
-  fullName          String          @map("full_name") @db.VarChar(100)
-  cgpa              Decimal?        @db.Decimal(3, 2)
-  bachelorsGpa      Decimal?        @map("bachelors_gpa") @db.Decimal(3, 2)
-  tenthPercentage   Decimal?        @map("tenth_percentage") @db.Decimal(5, 2)
-  twelfthPercentage Decimal?        @map("twelfth_percentage") @db.Decimal(5, 2)
-  diplomaPercentage Decimal?        @map("diploma_percentage") @db.Decimal(5, 2)
-  backlogs          Int             @default(0)
-  liveBacklogs      Int             @default(0) @map("live_backlogs")
-  placementStatus   PlacementStatus @default(not_placed) @map("placement_status")
-  resumeUrl         String?         @map("resume_url")
-  createdAt         DateTime?       @default(now()) @map("created_at")
-  updatedAt         DateTime?       @updatedAt @map("updated_at")
-  deletedAt         DateTime?       @map("deleted_at")
+  fullName                  String          @map("full_name") @db.VarChar(100)
+  cgpa                      Decimal?        @db.Decimal(3, 2)
+  bachelorsGpa              Decimal?        @map("bachelors_gpa") @db.Decimal(3, 2)
+  tenthPercentage           Decimal?        @map("tenth_percentage") @db.Decimal(5, 2)
+  twelfthPercentage         Decimal?        @map("twelfth_percentage") @db.Decimal(5, 2)
+  diplomaPercentage         Decimal?        @map("diploma_percentage") @db.Decimal(5, 2)
+  backlogs                  Int             @default(0)
+  liveBacklogs              Int             @default(0) @map("live_backlogs")
+  placementStatus           PlacementStatus @default(not_placed) @map("placement_status")
+  resumeUrl                 String?         @map("resume_url")
+  isVerifiedByPlacementCell Boolean         @default(false)
+  createdAt                 DateTime?       @default(now()) @map("created_at")
+  updatedAt                 DateTime?       @updatedAt @map("updated_at")
+  deletedAt                 DateTime?       @map("deleted_at")
 
   // Relations
   user           User           @relation(fields: [studentId], references: [userId])
@@ -141,7 +142,7 @@ model PlacementCellDegree {
 
 model Recruiter {
   recruiterId            String    @id @default(uuid()) @map("recruiter_id")
-  companyName            String    @map("company_name") @db.VarChar(100)
+  companyName            String    @unique @map("company_name") @db.VarChar(100)
   representativePosition String    @map("representative_position") @db.VarChar(100)
   description            String?   @db.Text
   website                String?   @db.VarChar(100)

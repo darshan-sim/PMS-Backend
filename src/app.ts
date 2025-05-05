@@ -5,6 +5,9 @@ import rateLimit from "express-rate-limit";
 import { Request, Response } from "express";
 import authRouter from "./routes/auth.route";
 import publicRoutes from "./routes/public.route";
+import recruiterRouter from "./routes/recruiter.route";
+import placementCellRouter from "./routes/placementCell.route";
+import studentRouter from "./routes/student.route";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { ResponseHandler } from "./utils/apiResponse";
 import { NotFoundError } from "./errors/NotFoundError";
@@ -25,7 +28,7 @@ app.use(
 app.use(
     rateLimit({
         windowMs: 15 * 60 * 1000,
-        max: 100,
+        max: 100000,
         handler: (req: Request, res: Response) => {
             ResponseHandler.error(res, new RateLimitError());
         },
@@ -39,6 +42,9 @@ app.use(express.json({ limit: "10kb" }));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1", publicRoutes);
+app.use("/api/v1/recruiters", recruiterRouter);
+app.use("/api/v1/placement_cells", placementCellRouter);
+app.use("/api/v1/students", studentRouter);
 
 app.get("/health", (req: Request, res: Response) => {
     res.status(200).json({ message: "Heart is betting....." });

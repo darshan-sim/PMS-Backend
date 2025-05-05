@@ -24,6 +24,18 @@ export class ResponseHandler {
         return res.status(HttpStatus.OK).json(response);
     }
 
+    static success<T>(
+        res: Response,
+        data: T,
+        message: string = "Request successful"
+    ): Response<ApiResponse<T>> {
+        return res.status(HttpStatus.OK).json({
+            success: true,
+            message,
+            data,
+        });
+    }
+
     static created<T>(
         res: Response,
         data: T,

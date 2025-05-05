@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { register, validateUserInput } from "../controllers/auth.controller";
+import {
+    loginController,
+    registerController,
+    validateUserInput,
+} from "../controllers/auth.controller";
 
 const router = Router();
 
-router.post("/register", register);
-// router.get("/login", (req: Request, res: Response) => {
-//   res.status(200).json({ message: "Login" });
-// });
+router.post("/register", registerController);
+router.post("/login", loginController);
 
 router.post("/validate-user", validateUserInput);
 

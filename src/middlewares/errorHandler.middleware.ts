@@ -12,7 +12,7 @@ export const errorHandler = (
     _next: NextFunction
 ): void => {
     let finalError: AppError;
-
+    console.error(err);
     if (err instanceof AppError) {
         finalError = err;
     } else if (err instanceof ZodError) {

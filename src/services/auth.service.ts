@@ -1,28 +1,17 @@
 import bcrypt from "bcrypt";
 import prisma from "../config/prisma";
+import jwt from "jsonwebtoken";
+import { ResponseHandler } from "../utils/apiResponse";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
 import {
+    AuthResponse,
     PlacementCellProfileData,
     RecruiterProfileData,
     RegisterInput,
     StudentProfileData,
 } from "../types/auth.types";
 import { ValidationError } from "../errors/ValidationError";
-
-// export const loginUser = async (email: string, password: string) => {
-//     const user = await prisma.user.findFirst({
-//         where: {
-//             email,
-//         },
-//     });
-
-//     if (user) {
-//         errorDetails.username = "Username already exists";
-//     }
-
-//     if (Object.keys(errorDetails).length > 0) {
-//         throw new ValidationError(errorDetails);
-//     }
-// };
+import { Response } from "express"; // Ensure this is imported
 
 export const validateUsernameAndEmail = async (
     username: string,
@@ -173,7 +162,7 @@ const validatePlacementCellData = async (
         where: { placementCellName },
     });
 
-    if (!placementCell) {
+    if (placementCell) {
         throw new ValidationError({
             placementCellName: "Placement cell name is taken",
         });
@@ -342,6 +331,17 @@ const registerRecruiter = async (
         companyEmail,
     } = recruiterProfileData;
 
+    // Check if the company name already exists
+    const existingRecruiter = await prisma.recruiter.findUnique({
+        where: { companyName },
+    });
+
+    if (existingRecruiter) {
+        throw new ValidationError({
+            companyName: "Company name already exists.",
+        });
+    }
+
     const result = await prisma.$transaction(async (prisma) => {
         const user = await prisma.user.create({
             data: {
@@ -367,4 +367,82 @@ const registerRecruiter = async (
     });
 
     return result;
+};
+
+interface TokenPayload {
+    type: string;
+    userId: string;
+    email: string;
+    role: string;
+    studentId?: string;
+    placementCellId?: string;
+    recruiterId?: string;
+}
+
+export const login = async (email: string, password: string, res: Response) => {
+    const user = await prisma.user.findUnique({
+        where: { email },
+    });
+
+    if (!user) {
+        throw new UnauthorizedError("Invalid email or password.");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new UnauthorizedError("Invalid email or password.");
+    }
+
+    const roleSpecificData: Partial<AuthResponse["user"]> = {};
+
+    if (user.role === "student") {
+        const student = await prisma.student.findUnique({
+            where: { studentId: user.userId },
+        });
+        if (student) {
+            roleSpecificData.studentId = student.studentId;
+        }
+    } else if (user.role === "placement_cell") {
+        const placementCell = await prisma.placementCell.findUnique({
+            where: { adminId: user.userId },
+        });
+        if (placementCell) {
+            roleSpecificData.placementCellId = placementCell.placementCellId;
+        }
+    } else if (user.role === "recruiter") {
+        const recruiter = await prisma.recruiter.findUnique({
+            where: { representativeId: user.userId },
+        });
+        if (recruiter) {
+            roleSpecificData.recruiterId = recruiter.recruiterId;
+        }
+    }
+
+    const tokenPayload: TokenPayload = {
+        type: "access",
+        userId: user.userId,
+        email: user.email,
+        role: user.role,
+        ...roleSpecificData,
+    };
+
+    const token = jwt.sign(
+        tokenPayload,
+        process.env.TOKEN_KEY || "secret-key",
+        { expiresIn: "24h" }
+    );
+
+    // Step 5: Create a response
+    const responseData: AuthResponse = {
+        token,
+        user: {
+            userId: user.userId,
+            email: user.email,
+            role: user.role,
+            ...roleSpecificData, // Add the relevant IDs based on the role
+        },
+    };
+
+    // Step 6: Send the response
+    ResponseHandler.success(res, responseData, "Login successful.");
 };

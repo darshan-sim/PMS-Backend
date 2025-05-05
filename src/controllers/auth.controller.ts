@@ -7,6 +7,7 @@ import { ResponseHandler } from "../utils/apiResponse";
 import {
     registerUser,
     validateUsernameAndEmail,
+    login,
 } from "../services/auth.service";
 import { SuccessMessage } from "../constants/messages";
 
@@ -27,7 +28,7 @@ export const validateUserInput = async (
     }
 };
 
-export const register = async (
+export const registerController = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -40,5 +41,18 @@ export const register = async (
         ResponseHandler.created(res, result, SuccessMessage.USER_REGISTERED);
     } catch (error) {
         next(error);
+    }
+};
+
+export const loginController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { email, password } = req.body;
+        await login(email, password, res);
+    } catch (err) {
+        next(err);
     }
 };
