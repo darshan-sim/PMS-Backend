@@ -3,19 +3,6 @@ import { hash } from "bcrypt";
 
 const prisma = new PrismaClient();
 
-const domains = [
-    "Software Development",
-    "Data Science",
-    "Artificial Intelligence",
-    "Cloud Computing",
-    "Cybersecurity",
-    "Web Development",
-    "Mobile Development",
-    "DevOps",
-    "UI/UX Design",
-    "Product Management",
-];
-
 const branches = [
     "Computer Science",
     "Electronics",
@@ -32,6 +19,14 @@ const placementCellNames = [
     "FutureLeaders Cell",
     "ProCareer Cell",
     "JobBridge Cell",
+];
+
+const placementCellDomains = [
+    ["@techplace.edu.in", "@techplace.ac.in"],
+    ["@careerconnect.edu.in", "@careerconnect.ac.in"],
+    ["@futureleaders.edu.in", "@futureleaders.ac.in"],
+    ["@procareer.edu.in", "@procareer.ac.in"],
+    ["@jobbridge.edu.in", "@jobbridge.ac.in"],
 ];
 
 const companyNames = [
@@ -69,7 +64,7 @@ async function main() {
         const adminUser = await prisma.user.create({
             data: {
                 username: `pcadmin${i + 1}`,
-                email: `pcadmin${i + 1}@example.com`,
+                email: `admin${i + 1}${placementCellDomains[i][0]}`,
                 password: hashedPassword,
                 role: Role.placement_cell,
                 isActive: true,
@@ -90,8 +85,9 @@ async function main() {
         const placementCell = await prisma.placementCell.create({
             data: {
                 placementCellName: placementCellNames[i],
+                domains: placementCellDomains[i],
                 isVerified: true,
-                placementCellEmail: `contact@${placementCellNames[i].toLowerCase().replace(/\s+/g, "")}.com`,
+                placementCellEmail: `contact${placementCellDomains[i][0]}`,
                 website: `https://${placementCellNames[i].toLowerCase().replace(/\s+/g, "")}.com`,
                 adminId: adminUser.userId,
                 branchId: branch!.branchId,
@@ -101,8 +97,8 @@ async function main() {
                     })),
                 },
                 placementCellDomains: {
-                    create: domains.slice(i * 2, (i + 1) * 2).map((domain) => ({
-                        domain,
+                    create: placementCellDomains[i].map((domain) => ({
+                        domain: domain.substring(1), // Remove @ from the domain
                     })),
                 },
             },
@@ -112,12 +108,14 @@ async function main() {
         for (let j = 0; j < 10; j++) {
             const studentNumber = i * 10 + j + 1;
             const hashedPassword = await hash("password123", 10);
+            const studentDomain =
+                placementCellDomains[i][j % placementCellDomains[i].length];
 
             // Create student user
             const studentUser = await prisma.user.create({
                 data: {
                     username: `student${studentNumber}`,
-                    email: `student${studentNumber}@example.com`,
+                    email: `student${studentNumber}${studentDomain}`,
                     password: hashedPassword,
                     role: Role.student,
                     isActive: true,
@@ -132,8 +130,8 @@ async function main() {
                     placementCellId: placementCell.placementCellId,
                     degreeId: selectedDegrees[0].degreeId,
                     fullName: `Student ${studentNumber}`,
-                    cgpa: 8.5 + Math.random() * 1.5,
-                    bachelorsGpa: 8.0 + Math.random() * 1.5,
+                    cgpa: Math.min(7.5 + Math.random() * 2, 9.9),
+                    bachelorsGpa: Math.min(7.0 + Math.random() * 2, 9.9),
                     tenthPercentage: 85 + Math.random() * 10,
                     twelfthPercentage: 80 + Math.random() * 10,
                     diplomaPercentage: 75 + Math.random() * 10,
@@ -153,7 +151,7 @@ async function main() {
         const recruiterUser = await prisma.user.create({
             data: {
                 username: `recruiter${i + 1}`,
-                email: `recruiter${i + 1}@example.com`,
+                email: `recruiter${i + 1}@${companyNames[i].toLowerCase().replace(/\s+/g, "")}.com`,
                 password: hashedPassword,
                 role: Role.recruiter,
                 isActive: true,
