@@ -9,6 +9,7 @@ import { errorHandler } from './middlewares/errorHandler.middleware';
 import { ResponseHandler } from './utils/apiResponse';
 import { NotFoundError } from './errors/NotFoundError';
 import { RateLimitError } from './errors/RateLimitError';
+import recruiterRoutes from './routes/recruiter.route';
 import prisma from './config/prisma';
 
 const app = express();
@@ -38,6 +39,7 @@ app.use(express.json({ limit: '10kb' }));
 // Routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', publicRoutes);
+app.use('/api/v1/recruiters', recruiterRoutes);
 
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Heart is betting.....' });
